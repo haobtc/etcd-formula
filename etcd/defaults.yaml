@@ -4,6 +4,14 @@
 etcd:
   binary_directory: /opt/etcd
   data_directory: /opt/etcd/data
+  ssl:
+    enabled: false
+    cert-file: ''
+    key-file: ''
+    ca-file: ''
+    peer-cert-file: ''
+    peer-key-file: ''
+    peer-ca-file: ''
 
   listen:
     bind_ip: ''

@@ -7,20 +7,35 @@
 {% set bind_ip = listen.get('bind_ip') or node_ip -%}
 {% set peer_port = etcd_settings.cluster.peer_port|string -%}
 {% set client_port = etcd_settings.cluster.client_port|string -%}
+
+{% set ssl_settings = etcd_settings.get('ssl', {}) -%}
+{% if ssl_settings.get('enabled') -%}
+ETCD_CA_FILE = "{{ ssl_settings.get('ca-file', '') }}"
+ETCD_CERT_FILE = "{{ ssl_settings.get('cert-file', '') }}"
+ETCD_KEY_FILE = "{{ ssl_settings.get('key-file', '') }}"
+ETCD_PEER_CA_FILE = "{{ ssl_settings.get('peer-ca-file', '') }}"
+ETCD_PEER_CERT_FILE = "{{ ssl_settings.get('peer-cert-file', '') }}"
+ETCD_PEER_KEY_FILE = "{{ ssl_settings.get('peer-key-file', '') }}"
+
+{% set scheme = 'https' -%}
+{% else -%}
+{% set scheme = 'http' %}
+{% endif -%}
+
 {% set peer_string = [] -%}
 
 {% for hostname,cfg in etcd_settings.cluster.peers.items() -%}
-{% if peer_string.append( hostname + "=http://" + cfg.ip + ":" + peer_port ) -%}
+{% if peer_string.append( hostname + "=" + scheme + "://" + cfg.ip + ":" + peer_port ) -%}
 {% endif -%}
 {% endfor %}
 
 ETCD_INITIAL_CLUSTER="{{ peer_string|join(',') }}"
 ETCD_INITIAL_CLUSTER_STATE="new"
 ETCD_INITIAL_CLUSTER_TOKEN="{{ etcd_settings.cluster.token }}"
-ETCD_INITIAL_ADVERTISE_PEER_URLS="http://{{ domain }}:{{ peer_port }}"
+ETCD_INITIAL_ADVERTISE_PEER_URLS="{{ scheme }}://{{ domain }}:{{ peer_port }}"
 ETCD_DATA_DIR="{{ etcd_settings.data_directory }}"
-ETCD_LISTEN_PEER_URLS="http://{{ bind_ip }}:{{ peer_port }}"
-ETCD_LISTEN_CLIENT_URLS="http://{{ bind_ip }}:{{ client_port }}"
-ETCD_ADVERTISE_CLIENT_URLS="http://{{ domain }}:{{ client_port }}"
+ETCD_LISTEN_PEER_URLS="{{ scheme }}://{{ bind_ip }}:{{ peer_port }}"
+ETCD_LISTEN_CLIENT_URLS="{{ scheme }}://{{ bind_ip }}:{{ client_port }}"
+ETCD_ADVERTISE_CLIENT_URLS="{{ scheme }}://{{ domain }}:{{ client_port }}"
 ETCD_NAME="{{ grains['host'] }}"
 
