@@ -5,6 +5,10 @@ etcd:
   binary_directory: /opt/etcd
   data_directory: /opt/etcd/data
 
+  listen:
+    bind_ip: ''
+    external_host: ''
+
   cluster:
     token: my-etcd-cluster
     peer_port: 2380
@@ -12,5 +16,5 @@ etcd:
   
   install:
     base_url: http://github.com/coreos/etcd/releases/download
-    version: 2.1.2
+    version: 3.2.8
 

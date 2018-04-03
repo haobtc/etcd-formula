@@ -10,7 +10,7 @@ Wants=network-online.target
 Environment=DAEMON_ARGS=
 Environment=ETCD_NAME=%H
 Environment=ETCD_DATA_DIR={{ etcd_settings.data_directory }}
-EnvironmentFile=-/etc/default/%p
+EnvironmentFile=-/etc/default/etcd
 StandardOutput=syslog
 WorkingDirectory={{ etcd_settings.data_directory }}
 #ExecStart=/bin/sh -c "GOMAXPROCS=$(nproc) /usr/bin/etcd $DAEMON_ARGS"
